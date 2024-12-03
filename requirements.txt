@@ -1,0 +1,6 @@
+torch>=1.9.0
+torchvision>=0.10.0
+pytest>=6.2.5
+torchsummary>=1.5.1
+tqdm>=4.62.0
+pytest-html>=3.1.1 
