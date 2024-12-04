@@ -1,7 +1,8 @@
 import torch
 import pytest
 import torch.nn.functional as F
-from MNIST_CNN import Net, test_loader, device, train, test, train_loader, optimizer, scheduler
+from MNIST_CNN import Net, test_loader, device, train, train_loader, optimizer, scheduler
+import MNIST_CNN  # Import the module to access the test function differently
 
 def count_parameters(model):
     """Count the trainable parameters in the model using torchsummary"""
@@ -59,6 +60,13 @@ def test_depthwise_separable():
     print('Depthwise Separable Convolutions found:', has_depthwise)
     assert has_depthwise, "Model must use Depthwise Separable Convolutions"
 
+def run_training_test():
+    """Run one epoch of training and testing"""
+    model = Net().to(device)
+    print("\nRunning one epoch of training...")
+    train(model, device, train_loader, optimizer, 1)
+    MNIST_CNN.test(model, device, test_loader)  # Use the module to access the test function
+
 if __name__ == "__main__":
     print("Running Model Architecture Tests...")
     test_parameter_count()
@@ -66,11 +74,5 @@ if __name__ == "__main__":
     test_dropout()
     test_gap_or_fc()
     test_depthwise_separable()
-    
-    # Run training and testing as done in MNIST_CNN.py
-    model = Net().to(device)
-    print("\nRunning one epoch of training...")
-    train(model, device, train_loader, optimizer, 1)
-    test(model, device, test_loader)
-    
+    run_training_test()
     print("\nAll tests passed successfully!")
