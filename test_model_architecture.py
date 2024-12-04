@@ -8,7 +8,6 @@ def count_parameters(model):
 def test_parameter_count():
     model = Net()
     total_params = count_parameters(model)
-    # Ensure the model has less than 20k parameters
     assert total_params < 20000, f"Model has {total_params} parameters, which exceeds the limit of 20,000"
 
 def test_batch_normalization():
@@ -43,4 +42,4 @@ def test_architecture_sequence():
             break
         prev_layer = module
     
-    assert conv_followed_by_bn, "Conv2d layers should be followed by BatchNorm2d" 
+    assert conv_followed_by_bn, "Conv2d layers should be followed by BatchNorm2d"
