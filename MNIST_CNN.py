@@ -7,20 +7,32 @@ from torchvision import datasets, transforms
 import torch.optim.lr_scheduler as lr_scheduler
 from torchvision.transforms import RandomAffine
 
+# Define DepthwiseSeparableConv
+class DepthwiseSeparableConv(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size=3, padding=1, bias=False):
+        super(DepthwiseSeparableConv, self).__init__()
+        self.depthwise = nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size,
+                                   padding=padding, groups=in_channels, bias=bias)
+        self.pointwise = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=bias)
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        return x
+
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         # Input Block
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, 16, 3, padding=1, bias=False),
-            nn.BatchNorm2d(16),
+            DepthwiseSeparableConv(1, 8, bias=False),   # Reduced filters to 8
+            nn.BatchNorm2d(8),
             nn.ReLU(),
-            nn.Dropout(0.05),  # Reduced dropout rate
+            nn.Dropout(0.05),
         )
         # Convolution Block 1
         self.conv2 = nn.Sequential(
-            nn.Conv2d(16, 32, 3, padding=1, bias=False),
-            nn.BatchNorm2d(32),
+            DepthwiseSeparableConv(8, 16, bias=False),  # Reduced filters to 16
+            nn.BatchNorm2d(16),
             nn.ReLU(),
             nn.Dropout(0.05),
         )
@@ -28,15 +40,15 @@ class Net(nn.Module):
         self.pool1 = nn.MaxPool2d(2, 2)
         # Convolution Block 2
         self.conv3 = nn.Sequential(
-            nn.Conv2d(32, 64, 3, padding=1, bias=False),
-            nn.BatchNorm2d(64),
+            DepthwiseSeparableConv(16, 32, bias=False), # Reduced filters to 32
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.Dropout(0.05),
         )
         # Convolution Block 3
         self.conv4 = nn.Sequential(
-            nn.Conv2d(64, 64, 3, padding=1, bias=False),
-            nn.BatchNorm2d(64),
+            DepthwiseSeparableConv(32, 32, bias=False), # Kept filters at 32
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.Dropout(0.05),
         )
@@ -44,14 +56,14 @@ class Net(nn.Module):
         self.pool2 = nn.MaxPool2d(2, 2)
         # Convolution Block 4
         self.conv5 = nn.Sequential(
-            nn.Conv2d(64, 128, 3, padding=1, bias=False),
-            nn.BatchNorm2d(128),
+            DepthwiseSeparableConv(32, 64, bias=False), # Reduced filters to 64
+            nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.Dropout(0.05),
         )
         # Global Average Pooling and Output
         self.gap = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(128, 10, bias=False)
+        self.fc = nn.Linear(64, 10, bias=False)        # Adjusted input features to 64
 
     def forward(self, x):
         x = self.conv1(x)
@@ -62,7 +74,7 @@ class Net(nn.Module):
         x = self.pool2(x)
         x = self.conv5(x)
         x = self.gap(x)
-        x = x.view(-1, 128)
+        x = x.view(-1, 64)                             # Adjusted for 64 channels
         x = self.fc(x)
         return F.log_softmax(x, dim=1)
 
@@ -93,7 +105,6 @@ test_loader = torch.utils.data.DataLoader(
                     ])),
     batch_size=batch_size, shuffle=True, **kwargs)
 
-#!pip install torchsummary
 from torchsummary import summary
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
@@ -115,7 +126,9 @@ def train(model, device, train_loader, optimizer, epoch):
         pbar.set_description(desc=f'loss={loss.item():.4f} batch_id={batch_idx}')
 
 
+# Modify test function to save the best model
 def test(model, device, test_loader):
+    global best_test_loss
     model.eval()
     test_loss = 0
     correct = 0
@@ -132,21 +145,30 @@ def test(model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
-    return test_loss
+    if test_loss < best_test_loss:
+        best_test_loss = test_loss
+        torch.save(model.state_dict(), 'best_model.pth')
+        print('Best model saved with test loss: {:.4f}'.format(best_test_loss))
+    return test_loss  
+
+# Initialize best_test_loss
+best_test_loss = float('inf')
 
 model = Net().to(device)
 # Adjusted optimizer and scheduler with higher max_lr
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-4)
+
 scheduler = lr_scheduler.OneCycleLR(
     optimizer,
-    max_lr=0.5,
+    max_lr=0.5,                      
     steps_per_epoch=len(train_loader),
-    epochs=7,
-    div_factor=5.0,
-    final_div_factor=1e4
+    epochs=7,                        
+    div_factor=5.0,                  
+    final_div_factor=1e4             
 )
 
-for epoch in range(1, 8):
+# Update the training loop for 7 epochs
+for epoch in range(1, 8):            # Train for 7 epochs
     print(f'\nEpoch {epoch}:')
     train(model, device, train_loader, optimizer, epoch)
     test_loss = test(model, device, test_loader)
