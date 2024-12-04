@@ -93,6 +93,7 @@ test_loader = torch.utils.data.DataLoader(
                     ])),
     batch_size=batch_size, shuffle=True, **kwargs)
 
+#!pip install torchsummary
 from torchsummary import summary
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
@@ -131,22 +132,21 @@ def test(model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
-    return test_loss  
+    return test_loss
 
 model = Net().to(device)
 # Adjusted optimizer and scheduler with higher max_lr
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-4)
-
 scheduler = lr_scheduler.OneCycleLR(
     optimizer,
-    max_lr=0.5,                      
+    max_lr=0.5,
     steps_per_epoch=len(train_loader),
-    epochs=7,                        
-    div_factor=5.0,                  
-    final_div_factor=1e4             
+    epochs=7,
+    div_factor=5.0,
+    final_div_factor=1e4
 )
 
-for epoch in range(1, 8):            
+for epoch in range(1, 8):
     print(f'\nEpoch {epoch}:')
     train(model, device, train_loader, optimizer, epoch)
     test_loss = test(model, device, test_loader)

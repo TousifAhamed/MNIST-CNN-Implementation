@@ -73,3 +73,14 @@ MIT
 ---
 ## Latest Test Results
 [This section is automatically updated by GitHub Actions with the latest test results]
+
+## Model Architecture Tests
+
+The model architecture is automatically tested for the following requirements:
+
+1. **Parameter Count**: Ensures the model has less than 20,000 trainable parameters
+2. **Batch Normalization**: Verifies the use of Batch Normalization layers
+3. **Dropout**: Confirms the presence of Dropout layers for regularization
+4. **Output Layer**: Checks for either Global Average Pooling or Fully Connected layer
+
+To run the tests locally:
