@@ -1,9 +1,14 @@
 import torch
 import pytest
 import torch.nn.functional as F
-from MNIST_CNN import Net, test_loader, device
+from MNIST_CNN import Net, test_loader, device, train, test, train_loader, optimizer, scheduler
 
 def count_parameters(model):
+    """Count the trainable parameters in the model"""
+    model = Net().to(device)
+    # Use torchsummary to get the same parameter count as in MNIST_CNN.py
+    from torchsummary import summary
+    summary(model, input_size=(1, 28, 28))
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 def test_parameter_count():
@@ -51,4 +56,11 @@ if __name__ == "__main__":
     test_batch_normalization()
     test_dropout()
     test_gap_or_fc()
+    
+    # Run training and testing as done in MNIST_CNN.py
+    model = Net().to(device)
+    print("\nRunning one epoch of training...")
+    train(model, device, train_loader, optimizer, 1)
+    test(model, device, test_loader)
+    
     print("\nAll tests passed successfully!")
