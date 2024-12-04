@@ -4,16 +4,15 @@ import torch.nn.functional as F
 from MNIST_CNN import Net, test_loader, device, train, test, train_loader, optimizer, scheduler
 
 def count_parameters(model):
-    """Count the trainable parameters in the model"""
-    model = Net().to(device)
-    # Use torchsummary to get the same parameter count as in MNIST_CNN.py
+    """Count the trainable parameters in the model using torchsummary"""
     from torchsummary import summary
+    print("\nModel Summary:")
     summary(model, input_size=(1, 28, 28))
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 def test_parameter_count():
     """Test 1: Check if model has less than 20k parameters"""
-    model = Net()
+    model = Net().to(device)
     total_params = count_parameters(model)
     print(f'\nModel Parameter Count Test:')
     print(f'Total trainable parameters: {total_params}')
@@ -50,12 +49,23 @@ def test_gap_or_fc():
     print(f'Fully Connected Layer found: {has_fc}')
     assert has_gap or has_fc, "Model must use either Global Average Pooling or Fully Connected Layer"
 
+def test_depthwise_separable():
+    """Test 5: Verify use of Depthwise Separable Convolutions"""
+    from MNIST_CNN import DepthwiseSeparableConv
+    model = Net()
+    has_depthwise = any(isinstance(module, DepthwiseSeparableConv) 
+                       for module in model.modules())
+    print('\nDepthwise Separable Convolution Test:')
+    print('Depthwise Separable Convolutions found:', has_depthwise)
+    assert has_depthwise, "Model must use Depthwise Separable Convolutions"
+
 if __name__ == "__main__":
     print("Running Model Architecture Tests...")
     test_parameter_count()
     test_batch_normalization()
     test_dropout()
     test_gap_or_fc()
+    test_depthwise_separable()
     
     # Run training and testing as done in MNIST_CNN.py
     model = Net().to(device)
