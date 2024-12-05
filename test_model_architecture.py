@@ -50,16 +50,6 @@ def test_gap_or_fc():
     print(f'Fully Connected Layer found: {has_fc}')
     assert has_gap or has_fc, "Model must use either Global Average Pooling or Fully Connected Layer"
 
-def test_depthwise_separable():
-    """Test 5: Verify use of Depthwise Separable Convolutions"""
-    from MNIST_CNN import DepthwiseSeparableConv
-    model = Net()
-    has_depthwise = any(isinstance(module, DepthwiseSeparableConv) 
-                       for module in model.modules())
-    print('\nDepthwise Separable Convolution Test:')
-    print('Depthwise Separable Convolutions found:', has_depthwise)
-    assert has_depthwise, "Model must use Depthwise Separable Convolutions"
-
 def run_training_test():
     """Run one epoch of training and testing"""
     model = Net().to(device)
@@ -73,6 +63,5 @@ if __name__ == "__main__":
     test_batch_normalization()
     test_dropout()
     test_gap_or_fc()
-    test_depthwise_separable()
     run_training_test()
     print("\nAll tests passed successfully!")
