@@ -64,15 +64,14 @@ This repository uses GitHub Actions for automated testing. The workflow:
 - Generates test reports
 
 ### Test Results
-The latest test results are automatically appended below:
-[Test results will be automatically updated by GitHub Actions]
+![Test Logs](./TEST_Logs.jpg)
 
 ## License
 MIT
 
 ---
-## Latest Test Results
-[This section is automatically updated by GitHub Actions with the latest test results]
+## GitHub Actions Varios Test Results: 
+
 
 ## Model Architecture Tests
 
