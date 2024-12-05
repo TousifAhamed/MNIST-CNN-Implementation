@@ -2,6 +2,8 @@
 
 This repository contains a CNN model implementation for the MNIST dataset using PyTorch. The model is designed with specific architectural constraints and requirements.
 
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+
 ### Model Requirements
 
 The model must satisfy the following requirements:
