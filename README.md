@@ -71,7 +71,7 @@ MIT
 
 ---
 ## GitHub Actions Varios Test Results: 
-
+![Github Actions Test Results](./Various_Test_Results.png)
 
 ## Model Architecture Tests
 
@@ -83,3 +83,9 @@ The model architecture is automatically tested for the following requirements:
 4. **Output Layer**: Checks for either Global Average Pooling or Fully Connected layer
 
 To run the tests locally:
+
+```
+pytest test_model_architecture.py -v
+```
+
+
