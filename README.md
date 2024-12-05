@@ -73,7 +73,7 @@ MIT
 
 ---
 ## GitHub Actions Varios Test Results: 
-![Github Actions Test Results](./Tests Cleared.png)
+![Github Actions Test Results](./Tests_Cleared.png)
 
 ## Model Architecture Tests
 
