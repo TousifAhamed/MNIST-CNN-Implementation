@@ -2,6 +2,8 @@
 
 This repository contains a CNN model implementation for the MNIST dataset using PyTorch. The model is designed with specific architectural constraints and requirements.
 
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+
 ### Model Requirements
 
 The model must satisfy the following requirements:
@@ -64,15 +66,14 @@ This repository uses GitHub Actions for automated testing. The workflow:
 - Generates test reports
 
 ### Test Results
-The latest test results are automatically appended below:
-[Test results will be automatically updated by GitHub Actions]
+![Test Logs](./TEST_Logs.jpg)
 
 ## License
 MIT
 
 ---
-## Latest Test Results
-[This section is automatically updated by GitHub Actions with the latest test results]
+## GitHub Actions Varios Test Results: 
+![Github Actions Test Results](./Various_Test_Results.png)
 
 ## Model Architecture Tests
 
@@ -84,3 +85,9 @@ The model architecture is automatically tested for the following requirements:
 4. **Output Layer**: Checks for either Global Average Pooling or Fully Connected layer
 
 To run the tests locally:
+
+```
+pytest test_model_architecture.py -v
+```
+
+
